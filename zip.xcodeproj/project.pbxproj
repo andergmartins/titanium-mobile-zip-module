@@ -136,7 +136,7 @@
 				1EF50DFF14B5D591000B79F0 /* ZipArchive.mm */,
 			);
 			name = ZipArchive;
-			path = ../../../Downloads/ZipArchive;
+			path = Classes;
 			sourceTree = "<group>";
 		};
 		1EF50DF414B5D591000B79F0 /* minizip */ = {
