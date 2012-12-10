@@ -5,3 +5,7 @@ build
 *.class
 *.pyc
 *.pyo
+
+/zip.xcodeproj/xcuserdata/andergmartins.xcuserdatad/
+/zip.xcodeproj/project.xcworkspace/xcuserdata/andergmartins.xcuserdatad/
+/.DS_Store
