@@ -6,7 +6,7 @@
  */
 #import "TiModule.h"
 
-@interface DeMarcelpociotZipModule : TiModule 
+@interface DeMarcelpociotZipModule : TiModule
 {
     KrollCallback *successCallback;
     KrollCallback *errorCallback;

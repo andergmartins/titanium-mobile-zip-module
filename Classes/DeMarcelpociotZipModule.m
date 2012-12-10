@@ -38,7 +38,7 @@
 	// this method is called when the module is first loaded
 	// you *must* call the superclass
 	[super startup];
-	
+
 	NSLog(@"[INFO] %@ loaded",self);
 }
 
@@ -47,12 +47,12 @@
 	// this method is called when the module is being unloaded
 	// typically this is during shutdown. make sure you don't do too
 	// much processing here or the app will be quit forceably
-	
+
 	// you *must* call the superclass
 	[super shutdown:sender];
 }
 
-#pragma mark Cleanup 
+#pragma mark Cleanup
 
 -(void)dealloc
 {
@@ -76,7 +76,7 @@
 {
 	if (count == 1 && [type isEqualToString:@"my_event"])
 	{
-		// the first (of potentially many) listener is being added 
+		// the first (of potentially many) listener is being added
 		// for event named 'my_event'
 	}
 }
@@ -97,7 +97,7 @@
 {
     RELEASE_TO_NIL(successCallback);
     ENSURE_SINGLE_ARG(args, NSDictionary);
-    
+
     TiFile *file        = [args objectForKey:@"file"];
     NSString *filename  = [(TiFile*)file path];
     NSString *target    = [args objectForKey:@"target"];
