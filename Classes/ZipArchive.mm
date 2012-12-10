@@ -172,7 +172,7 @@
 	return [self UnzipOpenFile:zipFile];
 }
 
--(BOOL) UnzipFileTo:(NSString*) path overWrite:(BOOL) overwrite
+-(BOOL) UnzipFileTo:(NSString*) path overWrite:(BOOL) overwrite originalFileName:(NSString*) originalFile withProgressCallback:(KrollCallback*) progressCallback withStartCallback:(KrollCallback*) startCallback withEventDispatcher:(DeMarcelpociotZipModule*) eventDispatcher
 {
 	BOOL success = YES;
 	int ret = unzGoToFirstFile( _unzFile );
@@ -182,8 +182,23 @@
 	{
 		[self OutputErrorMessage:@"Failed"];
 	}
-	
-	do{
+
+	long totalRead = 0;
+
+	// Get File Size
+    NSNumber *totalFileSize = [[fman attributesOfItemAtPath:originalFile error:NULL] objectForKey:NSFileSize];
+
+    NSLog(originalFile);
+
+    NSDictionary *event = [NSDictionary
+                           dictionaryWithObjectsAndKeys:
+                           totalFileSize,@"size",
+                           // send the files count
+                           nil];
+    [eventDispatcher _fireEventToListener:@"start" withObject:event listener:startCallback thisObject:nil];
+
+	do
+	{
 		if( [_password length]==0 )
 			ret = unzOpenCurrentFile( _unzFile );
 		else
@@ -240,6 +255,13 @@
                                           nil];
         [unzippedFiles addObject:_fileInfo];
 
+        // Get filesize
+        // NSFileManager *fm = [NSFileManager defaultManager];
+        NSNumber *fileSize = [[fman attributesOfItemAtPath:fullPath error:NULL] objectForKey:NSFileSize];
+        // [fm release];
+
+        int steps = 0;
+
 		FILE* fp = fopen( (const char*)[fullPath UTF8String], "wb");
 		while( fp )
 		{
@@ -247,6 +269,15 @@
 			if( read > 0 )
 			{
 				fwrite(buffer, read, 1, fp );
+
+                if( progressCallback != nil && eventDispatcher != nil )
+                {
+                	steps++;
+                	totalRead += read;
+
+		            NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:fullPath,@"path", fileSize,@"size", [NSNumber numberWithInt:read],@"read", [NSNumber numberWithLong:totalRead],@"totalRead", nil];
+		            [eventDispatcher _fireEventToListener:@"progress" withObject:event listener:progressCallback thisObject:nil];
+		        }
 			}
 			else if( read<0 )
 			{

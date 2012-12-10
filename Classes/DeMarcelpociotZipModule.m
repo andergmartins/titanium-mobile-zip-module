@@ -101,19 +101,20 @@
     TiFile *file        = [args objectForKey:@"file"];
     NSString *filename  = [(TiFile*)file path];
     NSString *target    = [args objectForKey:@"target"];
+    startCallback       = [[args objectForKey:@"start"] retain];
     successCallback     = [[args objectForKey:@"success"] retain];
     errorCallback       = [[args objectForKey:@"error"] retain];
+    progressCallback    = [[args objectForKey:@"progress"] retain];
     bool overwrite      = [TiUtils boolValue:[args objectForKey:@"overwrite"] def:YES];
-
     ZipArchive *zip = [[ZipArchive alloc] init];
-    
+
     NSURL *targetUrl    = [NSURL URLWithString:target];
     NSString *newtarget = [targetUrl path];
-    
+
     if( [zip UnzipOpenFile:filename] ){
-        BOOL result = [zip UnzipFileTo:newtarget overWrite:overwrite];
+        BOOL result = [zip UnzipFileTo:newtarget overWrite:overwrite originalFileName:filename withProgressCallback:progressCallback withStartCallback:startCallback withEventDispatcher:self];
         if( successCallback != nil ){
-            NSDictionary *event = [NSDictionary 
+            NSDictionary *event = [NSDictionary
                                    dictionaryWithObjectsAndKeys:
                                    newtarget,@"target",
                                    zip.unzippedFiles,@"files",
@@ -138,9 +139,9 @@
     NSString *filename  = [(TiFile*)file path];
 
     successCallback     = [[args objectForKey:@"success"] retain];
-    
+
     NSArray *files      = [args objectForKey:@"files"];
-    
+
     ZipArchive *zip = [[ZipArchive alloc] init];
     // Create file
     [zip CreateZipFile2:filename];

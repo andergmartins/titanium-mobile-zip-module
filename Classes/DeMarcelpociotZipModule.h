@@ -8,8 +8,10 @@
 
 @interface DeMarcelpociotZipModule : TiModule
 {
+    KrollCallback *startCallback;
     KrollCallback *successCallback;
     KrollCallback *errorCallback;
+    KrollCallback *progressCallback;
 }
 
 @end

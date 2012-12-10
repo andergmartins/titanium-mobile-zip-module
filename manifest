@@ -2,7 +2,7 @@
 # this is your module manifest and used by Titanium
 # during compilation, packaging, distribution, etc.
 #
-version: 1.0.1
+version: 1.2.5
 apiversion: 2
 description: ZIP module for iOS
 author: Marcel Pociot, Anderson G. Martins
@@ -12,7 +12,7 @@ copyright: Marcel Pociot
 
 # these should not be edited
 name: zip
-moduleid: com.realcodelab.zip
+moduleid: de.marcelpociot.zip
 guid: a19d17ef-8045-4064-8277-22cae6a35911
 platform: iphone
 minsdk: 1.8.0.1

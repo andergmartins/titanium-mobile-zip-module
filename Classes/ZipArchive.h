@@ -13,9 +13,11 @@
 //    01-10-2012 version 1.3    titanium improvements (m.pociot@gmail.com)
 
 #import <UIKit/UIKit.h>
+#import "TiModule.h"
 
 #include "minizip/zip.h"
 #include "minizip/unzip.h"
+#include "DeMarcelpociotZipModule.h"
 
 
 @protocol ZipArchiveDelegate <NSObject>
@@ -46,6 +48,6 @@
 
 -(BOOL) UnzipOpenFile:(NSString*) zipFile;
 -(BOOL) UnzipOpenFile:(NSString*) zipFile Password:(NSString*) password;
--(BOOL) UnzipFileTo:(NSString*) path overWrite:(BOOL) overwrite;
+-(BOOL) UnzipFileTo:(NSString*) path overWrite:(BOOL) overwrite originalFileName:(NSString*) originalFile withProgressCallback:(KrollCallback*) progressCallback withStartCallback:(KrollCallback*) startCallback withEventDispatcher:(DeMarcelpociotZipModule*) eventDispatcher;
 -(BOOL) UnzipCloseFile;
 @end
