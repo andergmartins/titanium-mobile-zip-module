@@ -538,6 +538,7 @@ extern int ZEXPORT unzGetGlobalInfo (file,pglobal_info)
         return UNZ_PARAMERROR;
     s=(unz_s*)file;
     *pglobal_info=s->gi;
+    // pglobal_info->uncompressed_size = s->pfile_in_zip_read->rest_read_uncompressed;
     return UNZ_OK;
 }
 

@@ -46,8 +46,8 @@
 -(BOOL) addFileToZip:(NSString*) file newname:(NSString*) newname;
 -(BOOL) CloseZipFile2;
 
--(BOOL) UnzipOpenFile:(NSString*) zipFile;
--(BOOL) UnzipOpenFile:(NSString*) zipFile Password:(NSString*) password;
--(BOOL) UnzipFileTo:(NSString*) path overWrite:(BOOL) overwrite originalFileName:(NSString*) originalFile withProgressCallback:(KrollCallback*) progressCallback withStartCallback:(KrollCallback*) startCallback withEventDispatcher:(DeMarcelpociotZipModule*) eventDispatcher;
+-(BOOL) UnzipOpenFile:(NSString*) zipFile withStartCallback:(KrollCallback*) startCallback withEventDispatcher:(DeMarcelpociotZipModule*) eventDispatcher;
+-(BOOL) UnzipOpenFile:(NSString*) zipFile Password:(NSString*) password withStartCallback:(KrollCallback*) startCallback withEventDispatcher:(DeMarcelpociotZipModule*) eventDispatcher;
+-(BOOL) UnzipFileTo:(NSString*) path overWrite:(BOOL) overwrite originalFileName:(NSString*) originalFile withProgressCallback:(KrollCallback*) progressCallback withEventDispatcher:(DeMarcelpociotZipModule*) eventDispatcher;
 -(BOOL) UnzipCloseFile;
 @end

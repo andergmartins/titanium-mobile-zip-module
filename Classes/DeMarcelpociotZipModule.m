@@ -111,8 +111,8 @@
     NSURL *targetUrl    = [NSURL URLWithString:target];
     NSString *newtarget = [targetUrl path];
 
-    if( [zip UnzipOpenFile:filename] ){
-        BOOL result = [zip UnzipFileTo:newtarget overWrite:overwrite originalFileName:filename withProgressCallback:progressCallback withStartCallback:startCallback withEventDispatcher:self];
+    if( [zip UnzipOpenFile:filename withStartCallback:startCallback withEventDispatcher:self] ){
+        BOOL result = [zip UnzipFileTo:newtarget overWrite:overwrite originalFileName:filename withProgressCallback:progressCallback withEventDispatcher:self];
         if( successCallback != nil ){
             NSDictionary *event = [NSDictionary
                                    dictionaryWithObjectsAndKeys:

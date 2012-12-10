@@ -94,6 +94,7 @@ typedef struct unz_global_info_s
     uLong number_entry;         /* total number of entries in
                        the central dir on this disk */
     uLong size_comment;         /* size of the global comment of the zipfile */
+    uLong uncompressed_size;
 } unz_global_info;
 
 

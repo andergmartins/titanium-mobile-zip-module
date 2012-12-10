@@ -10,6 +10,7 @@
 #import "ZipArchive.h"
 #import "zlib.h"
 #import "zconf.h"
+#import "minizip/unzip.h"
 
 
 
@@ -151,7 +152,7 @@
 	return ret;
 }
 
--(BOOL) UnzipOpenFile:(NSString*) zipFile
+-(BOOL) UnzipOpenFile:(NSString*) zipFile withStartCallback:(KrollCallback*) startCallback withEventDispatcher:(DeMarcelpociotZipModule*) eventDispatcher
 {
 	_unzFile = unzOpen( (const char*)[zipFile UTF8String] );
 	if( _unzFile )
@@ -159,20 +160,27 @@
 		unz_global_info  globalInfo = {0};
 		if( unzGetGlobalInfo(_unzFile, &globalInfo )==UNZ_OK )
 		{
-			NSLog([NSString stringWithFormat:@"%d entries in the zip file",globalInfo.number_entry] );
+			NSDictionary *event = [NSDictionary
+		                           dictionaryWithObjectsAndKeys:
+		                           [NSNumber numberWithInt:globalInfo.number_entry],@"totalFiles",
+		                           // send the files count
+		                           nil];
+		    [eventDispatcher _fireEventToListener:@"start" withObject:event listener:startCallback thisObject:nil];
+
+			NSLog([NSString stringWithFormat:@"%d entries in the zip file...",globalInfo.number_entry] );
 		}
         unzippedFiles = [[NSMutableArray alloc] init];
 	}
 	return _unzFile!=NULL;
 }
 
--(BOOL) UnzipOpenFile:(NSString*) zipFile Password:(NSString*) password
+-(BOOL) UnzipOpenFile:(NSString*) zipFile Password:(NSString*) password withStartCallback:(KrollCallback*) startCallback withEventDispatcher:(DeMarcelpociotZipModule*) eventDispatcher
 {
 	_password = password;
-	return [self UnzipOpenFile:zipFile];
+	return [self UnzipOpenFile:zipFile withStartCallback:startCallback withEventDispatcher:eventDispatcher];
 }
 
--(BOOL) UnzipFileTo:(NSString*) path overWrite:(BOOL) overwrite originalFileName:(NSString*) originalFile withProgressCallback:(KrollCallback*) progressCallback withStartCallback:(KrollCallback*) startCallback withEventDispatcher:(DeMarcelpociotZipModule*) eventDispatcher
+-(BOOL) UnzipFileTo:(NSString*) path overWrite:(BOOL) overwrite originalFileName:(NSString*) originalFile withProgressCallback:(KrollCallback*) progressCallback withEventDispatcher:(DeMarcelpociotZipModule*) eventDispatcher
 {
 	BOOL success = YES;
 	int ret = unzGoToFirstFile( _unzFile );
@@ -184,18 +192,20 @@
 	}
 
 	long totalRead = 0;
+	int fileIndex = 0;
 
 	// Get File Size
-    NSNumber *totalFileSize = [[fman attributesOfItemAtPath:originalFile error:NULL] objectForKey:NSFileSize];
+    // NSNumber *totalFileSize = [[fman attributesOfItemAtPath:originalFile error:NULL] objectForKey:NSFileSize];
 
-    NSLog(originalFile);
+    // NSLog([NSString stringWithFormat:@"Size: %d", totalFileSize);
+    // NSLog([fman attributesOfItemAtPath:originalFile error:NULL]);
 
-    NSDictionary *event = [NSDictionary
-                           dictionaryWithObjectsAndKeys:
-                           totalFileSize,@"size",
-                           // send the files count
-                           nil];
-    [eventDispatcher _fireEventToListener:@"start" withObject:event listener:startCallback thisObject:nil];
+    // NSDictionary *event = [NSDictionary
+    //                        dictionaryWithObjectsAndKeys:
+    //                        totalFileSize,@"size",
+    //                        // send the files count
+    //                        nil];
+    // [eventDispatcher _fireEventToListener:@"start" withObject:event listener:startCallback thisObject:nil];
 
 	do
 	{
@@ -256,11 +266,9 @@
         [unzippedFiles addObject:_fileInfo];
 
         // Get filesize
-        // NSFileManager *fm = [NSFileManager defaultManager];
         NSNumber *fileSize = [[fman attributesOfItemAtPath:fullPath error:NULL] objectForKey:NSFileSize];
-        // [fm release];
 
-        int steps = 0;
+        fileIndex++;
 
 		FILE* fp = fopen( (const char*)[fullPath UTF8String], "wb");
 		while( fp )
@@ -272,10 +280,9 @@
 
                 if( progressCallback != nil && eventDispatcher != nil )
                 {
-                	steps++;
                 	totalRead += read;
 
-		            NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:fullPath,@"path", fileSize,@"size", [NSNumber numberWithInt:read],@"read", [NSNumber numberWithLong:totalRead],@"totalRead", nil];
+		            NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:fullPath,@"path", fileSize,@"size", [NSNumber numberWithInt:read],@"read", [NSNumber numberWithLong:totalRead],@"totalRead", [NSNumber numberWithInt:fileIndex],@"fileIndex", nil];
 		            [eventDispatcher _fireEventToListener:@"progress" withObject:event listener:progressCallback thisObject:nil];
 		        }
 			}
@@ -285,7 +292,9 @@
 				break;
 			}
 			else
+			{
 				break;
+			}
 		}
 		if( fp )
 		{
@@ -323,9 +332,6 @@
 				}
 
 			}
-
-
-
 		}
 		unzCloseCurrentFile( _unzFile );
 		ret = unzGoToNextFile( _unzFile );
